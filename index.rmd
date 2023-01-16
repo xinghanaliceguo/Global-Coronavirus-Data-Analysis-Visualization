@@ -1,0 +1,236 @@
+INDEX.RMD
+---
+title: "Report on COVID Cases and Vaccination Progress"
+author: "Hanxiao Fu, Xinghan Guo, and Zhuohui Wu"
+date: "2/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+source("analysis.R")
+
+```
+
+## Problem Domain Description
+
+
+In the current state of Covid-19 ravages, people as well have experienced a painful year. But we finally found a ray of light in the darkness, the Covid-19 vaccine has been successfully manufactured and is now available to the public.However, the rate of vaccine generation is still far from expected, and we are not optimistic about the current situation.We want to use data and analysis to understand the current rate of vaccine effectiveness (including prevalence, appointment rates, etc.)
+
+The main reason we chose this data as our primary study is because it's really relevant to us. We have experienced a full year of online classes in zoom and our group members miss the normal campus life. Given the current situation, we all agree that vaccines are the best helper to help us get back to normal life as soon as possible, while keeping as much social distance. So we were initially very concerned about the status and speed of vaccinations, which will most likely affect whether we can successfully return to school this fall. We also hope to use this study to give a full report to ourselves or to those who share our concern about the need for vaccines.
+
+In addition, we're interested in examining what role does each country's policy stringency play in vaccination progress. We want to see if different policy stringency levels are correlated with different vaccination progress.
+
+
+
+
+## Data Description
+
+### Data Structure Description
+#### Covid_Confirmed_Cases Data Set
+1. This data set includes COVID-19 global confirmed cases over time.
+
+2. - [ Click to see the URL ](https://ourworldindata.org/grapher/covid-daily-vs-total-cases?time=2020-01-22..latest)
+   -  Raw data on confirmed cases are sourced from the COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University. This data set has been collected, aggregated, and operated by Our World in Data. It is updated daily and includes data on confirmed cases.
+   
+3. In order to make it more effective, I did some simple data wranglings in this subsection based on the raw data set. The data set looks like the table below. For this initial step of data wranglings, I filter the "Code" feature by only leaving "Entity" having "Code", and then I filter out the "World" Entity. The "Entity" left was all the country names, then I rename this feature as "Country". Also, for future convenience, I also change the “date” feature to the "Date" type.  
+   
+```{r sample_cases_data_set, echo = FALSE}
+kable(sample_cases_df)
+```
+
+4. Explain each of the features (columns) represents:
+   - **"Code"** is the abbrevations of countries
+   - **"confirmed_cases"** is the total confirmed cases of COVID.19, and the data is **cumulative**. 
+
+#### Vaccination Data Set
+
+1. Data on the COVID vaccination progress in 64 countries from 2020 to 2021. Being updated each day, it counts how many vaccine doses are administered as well has how many people are vaccinated (some may receive more than one dose).
+
+2. This data is collected by Our World in Data, a non-profit organization dedicated to data science research on large problems that affect the world. The vaccination data comes from government reports. [Here's a link to the dataset.](https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv)
+
+3. Here's a sample of the dataset, filtered for the most recent date. We used head( ) to select the first several rows.
+
+
+```{r sample_data, echo = FALSE}
+kable(vaccination_sample)
+```
+
+4. Explain each of the features (columns) represents:
+
+- total_vaccinations: total number of COVID vaccine doses administered until the report date (in "date" column)
+- people_vaccinated: total number of people who have received one or more doses of COVID vaccine
+- people_fully_vaccinated: total number of people who are fully vaccinated (in other words, have received required doses of COVID vaccine)
+
+#### Covid-stringency-index Data Set
+
+1. This data is a composite measure based on nine response indicators including school closures, workplace closures,
+and travel bans
+
+This index records the number and strictness of government policies.
+
+2. - _covid-stringency-index data_[link](https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker)
+
+   - source: Thomas Hale, Sam Webster, Anna Petherick, Toby Phillips, and Beatriz Kira (2020). Oxford COVID-19 Government Response Tracker, Blavatnik School of Government.
+   
+3. The data set include many different country data; it is hard to present them all so chose US as a example, below is the 
+sample table and graph of this data set.
+
+#### data example table
+````{r stringency_table, echo = FALSE}
+kable(table_stringency)
+```
+
+
+
+### Data Summary Analysis  
+
+#### Covid_Confirmed_Cases Data Set
+1. The most recent date is **`r most_recent_date`**. The summary statistics of the "confirmed_cases" feature for this data set include **`r summary_statistics`**. Until recently, the country with the fewest confirmed cases had only **1** case, but the country with the most confirmed cases had **28,190,159** cases. Around the globe, each country has **588,006** cases on average, and the median number of cases is **59,557**. Based on this distribution, we can infer that some countries had huge cases.
+
+2. Here is the plot of the trends of confirmed cases over time. Since there are nearly two hundred countries in the data set, I selected the top five countries with the most confirmed cases as examples. 
+```{r cases_trend_plot, echo = FALSE}
+cases_trend_plot
+```
+
+3. There are some NA values in the "confirmed_cases" feature/ column. To prevent skewed analysis due to the missing values, I have filtered the NA values out at the initial step of data wranglings of this data set.
+
+
+#### Vaccination Data Set
+
+1. So far, the country that has administered the most vaccinations is **`r most_vaccination_country`**, which has administered **`r most_vaccination_num`** vaccinations. The country that has administered the least vaccinations is **`r least_vaccination_country`**, which has administered **`r least_vaccination_num`** vaccinations.
+
+2. Below are the top three countries that have administered the largest number of COVID vaccine so far. Note that _the speed of data collection varies across countries_: the date on which the newest COVID vaccination data was collected was `r usa_vaccination_date` for United States, `r china_vaccination_date` for China, and `r uk_vaccination_date` for United Kingdom.
+
+```{r graph, echo = FALSE}
+vaccination_summary_graph
+```
+
+3. The outliner of this dataset is **`r least_vaccination_country`**, because the number of total vaccinations is extremely small, compared to the top three countries. This is probably because `r least_vaccination_country`'s data collection lags behind: the newest data for the top three countries was collected in 2021, while the newest for `r least_vaccination_country` was collected on **`r least_vaccination_date`**. This suggests that `r least_vaccination_country`'s data may be incomplete in nature.
+
+
+#### Covid-stringency-index Data Set
+
+The data cover the date range of  **`r range_stringency`**
+
+##### US stringency index vs date
+````{r stringency_plot, echo = FALSE}
+us_stringency_plot
+```
+
+##### na value is not helpful in this dataset therefor all na values are dropped.
+
+
+### Specific Question Analyses 1
+
+1. **Introduction** 
+The question is **_Is more vaccination correlated with fewer daily new covid cases?_** 
+I try to explore the effects of vaccination progressions by finding if there is a correlation between the increasing total doses of covid vaccinations and the change of the number of daily new covid cases.
+
+2. **Analysis Method** 
+Since there are nearly 200 countries in the data set, it's necessary to select representative ones first. I filtered the top 10 countries with the most covid confirmed cases according to the data in the most recent date and selected the four most representative ones as the code below. 
+
+```{r representative_countries, echo = TRUE}
+max_cases_df <- global_cases_df %>%
+  filter(Date == max(Date)) %>%
+  arrange(confirmed_cases) %>%
+  tail(n = 10) %>%
+  select(Country)
+```
+
+I calculated the daily new cases and compared the trend to the trend of total administrated doses of vaccinations in these four countries over time.
+
+3. **Results of analysis**
+Here is the **sample table of quantitative values** I produced and used to calculate the final answer. The whole table is up to 98 rows, I showed the head rows here. 
+
+```{r sample_values_table, echo = FALSE}
+kable(summary_values_df)
+```
+
+Here is the **table of the results of correlations** for the selected four countries.
+
+```{r summary_correlation_table, echo = FALSE}
+kable(summary_correlation_results)
+```
+
+Here are the **graphical results** I produced according to the values above.
+Since the daily new cases of the United States are extremely small, I produce it as a single plot. For the other three countries with a similar range, I produced a faced plot.
+
+```{r question_1_plots, echo = FALSE}
+new_cases_vs_tot_vaccination_plot_1
+new_cases_vs_tot_vaccination_plot_2
+```
+
+4. **Evaluation:** According to the calculated results of correlations, the answer to question 1 is No. Since there are positive and negative correlations with different extents expressed by the results, we can't have the conclusion that more vaccination is correlated with fewer daily new covid cases. I think there are the influences of confounding variables, such as population density, total confirmed cases in one country, ages. 
+
+    - For the population density, intuitively COVID spread fast in the large population density. 
+
+    - For the second confounding variable, we surprisingly found that there was an obvious downtrend line with small fluctuations in the plot of the United States. The data also showed a strong correlation value of -0.674, which showed that in countries with extremely high confirmed cases, the increase in the number of total administrative doses of vaccines is related to the decrease in daily new cases.
+
+    - The vaccine is still in the research stage, and there are restrictions on the age of the injection population. It does not significantly help the elderly, but the elderly are the most vulnerable people for COVID-19. This may also be a reason why the correlation is not obvious.
+
+    Considering both the quantitative results and confounding variables, it's hard to have an absolute conclusion. It still needs a longer time to determine the effects of vaccination progressions.
+
+### Specific Question Analyses 2
+
+1. **Introduction** 
+
+The question is: **_Do countries that have more stringent policies administer more vaccinations?_**
+
+We want to compare the country policy stringency index with total vaccinations administered and see if there's a correlation between them. We hypothesize that there will be a positive correlation between policy stringency and vaccinations, because countries that take COVID more seriously will have more strict policies and more vaccines.
+
+2. **Analysis Method** 
+
+We first calculated the average policy stringency over time for each country. We then joined the policy data frame and vaccination data frame by date, because the policy one is newer than the vaccination one and we want to omit excess rows. After that, we filtered for the most recent date, because that way in the "total_vaccinations" column we will have the total number of vaccinations _so far_. We also omitted rows that contain NA value (whose policy stringency indexes are not documented). Now we have 56 countries in total. Next, we arranged the data frame by policy stringency index (from the lowest to highest) and tested the correlation between policy stringency and vaccination with cor.test( ).
+
+3. **Results of analysis**
+
+We found that the **correlation** between policy stringency and vaccinations is **0.3027273**, with a **p-value** of **0.02334**.
+
+Here's a graph illustrating the relationship between policy stringency and vaccinations. Each dot represents one country.
+
+```{r policy_vs_vaccination_graph, echo = FALSE, message = FALSE}
+policy_vs_vaccination_graph
+```
+
+4. **Evaluation:** Based on the quantitative result, we conclude that there's a **weak positive correlation** between policy stringency and vaccinations. The p-value is less that 0.05, so this finding is statistically significant. The answer to our question is yes - but only to an extent. This may due to a lot of reasons. For example, we assumed that countries that take COVID more seriously will have more stringent policies _and_ more vaccinations, but maybe countries that have reduced COVID cases by stringent policies do not need vaccinations as much as others. It may also be attributed to our data wrangling method - we calculated the average policy stringency over time, but policies are always changing due to a lot of factors, which may not be simply represented by an average number.
+
+### Specific Question Analyses 3
+
+ 1. **Introduction** 
+ The question I am focusing on is **_Do countries that have more stringent policies have less daily new Covid19 cases?_**
+ 
+ My aim was to explore whether the severity of the national policy would affect the number of new cases per day. This can be learned by comparing the daily new cases vs time plot and stringency index vs time plot. By comparing the trend we should be able to conclude their relationship.
+ 
+ 
+ 
+ 2. **Analysis Method**
+ 
+ This dataset contains data from more than 100 countries, and it is difficult to show all of them again, so after filtering the top ten countries in terms of Covid19 numbers, three most representative countries were selected from them, namely the United States, the France and India. These three countries are in three different continents and are the most representative.
+ 
+ 
+##### plotted the daily graph of new confirmed cases in these three countries over time
+````{r newcase_plot, echo = FALSE}
+case_vs_time_newcase_plot
+```
+
+##### plotted the stringency index over time in these three countries  
+````{r stringency_index_plot, echo = FALSE}
+newcase_with_stringency_plot
+```
+
+ 
+ 
+ 3.**Results of analysis**
+ 
+To better compare the relationship between the two curves, I merged the two graphs. After aligning the timeline I got the following results
+ 
+````{r combined_plot, echo = FALSE}
+Combined_newcases_stringency
+```
+
+ 4.**Evaluation:** 
+- It is easy to see from the two aligned charts above that all three countries had varying degrees of reduction in stringency index before there was a significant increase in new diagnoses. This is not very evident in India, but it is obvious in France and the United States. This suggests that the number of infections rose significantly after the state lowered its control over nationals. Similarly, the number of new infections decreases after the stringency index rises.
+
+Another point worth noting is that the ups and downs of the upper and lower data do not occur at exactly the same time. My guess is that there is usually some time delay associated with the policy taking effect.
+
