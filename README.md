@@ -1,5 +1,8 @@
 # Global-Coronavirus-Data-Analysis-Visualization
-
+## Author
+* Xinghan Guo
+* Xiaofu Han
+* Zhuohui Wu
 ## Problem Domain
 ### Our areas of focus
 ```
