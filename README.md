@@ -1,5 +1,5 @@
 # Global-Coronavirus-Data-Analysis-Visualization
-## Author
+## Authors
 * Xinghan Guo
 * Xiaofu Han
 * Zhuohui Wu
